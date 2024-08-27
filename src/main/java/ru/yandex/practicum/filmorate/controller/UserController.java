@@ -16,13 +16,17 @@ import java.util.Map;
 public class UserController {
     private final Map<Long, User> users = new HashMap<>();
 
-    /** Получение списка всех пользователей */
+    /**
+     * Получение списка всех пользователей
+     */
     @GetMapping
     public Collection<User> getAllUsers() {
         return users.values();
     }
 
-    /** Добавление нового пользователя */
+    /**
+     * Добавление нового пользователя
+     */
     @PostMapping
     public User create(@RequestBody User newUser) throws ValidationException {
         if (newUser.getEmail() == null || newUser.getEmail().isEmpty() || !newUser.getEmail().contains("@")) {
@@ -51,7 +55,9 @@ public class UserController {
         return ++currentMaxId;
     }
 
-    /** Обновление данных существующего пользователя */
+    /**
+     * Обновление данных существующего пользователя
+     */
     public User update(@RequestBody User newUser) throws ValidationException {
         if (newUser.getId() == null) {
             throw new ValidationException("id должен быть указан");

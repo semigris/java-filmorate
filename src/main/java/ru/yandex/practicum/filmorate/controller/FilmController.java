@@ -16,13 +16,17 @@ import java.util.Map;
 public class FilmController {
     private final Map<Long, Film> films = new HashMap<>();
 
-    /** Получение списка фильмов */
+    /**
+     * Получение списка фильмов
+     */
     @GetMapping
     public Collection<Film> getAllFilms() {
         return films.values();
     }
 
-    /** Добавление нового фильма */
+    /**
+     * Добавление нового фильма
+     */
     @PostMapping
     public Film create(@RequestBody Film newFilm) throws ValidationException {
         if (newFilm.getName() == null || newFilm.getName().isEmpty()) {
@@ -51,7 +55,9 @@ public class FilmController {
         return ++currentMaxId;
     }
 
-    /** Обновление данных существующего фильма */
+    /**
+     * Обновление данных существующего фильма
+     */
     @PutMapping
     public Film update(@RequestBody Film newFilm) throws ValidationException {
         if (newFilm.getId() == null) {
