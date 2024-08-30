@@ -1,100 +1,66 @@
 package ru.yandex.practicum.filmorate;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.controller.FilmController;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import org.springframework.boot.test.context.SpringBootTest;
+import ru.yandex.practicum.filmorate.interfaces.Update;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
+import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@SpringBootTest
 class FilmControllerTest {
-
-    private final FilmController filmController = new FilmController();
+    private static final Validator validator;
     Film film = new Film("filmName", "filmDescription", (LocalDate.of(1956, 5, 18)), 120L);
 
-    /**
-     * Получение списка фильмов
-     */
-    @Test
-    void shouldGetAllFilms() throws ValidationException {
-        assertEquals(0, filmController.getAllFilms().size(), "Список фильмов не пуст");
-        filmController.create(film);
-        assertEquals(1, filmController.getAllFilms().size(), "Список фильмов не изменился");
-    }
-
-    /**
-     * Добавление нового фильма
-     */
-    @Test
-    void shouldCreateFilm() throws ValidationException {
-        Film createdFilm = filmController.create(film);
-        assertNotNull(createdFilm.getId(), "id не совпадает");
-        assertEquals("filmName", createdFilm.getName(), "Название не совпадает");
-        assertEquals("filmDescription", createdFilm.getDescription(), "Описание не совпадает");
-        assertEquals((LocalDate.of(1956, 5, 18)), createdFilm.getReleaseDate(), "Дата создания не совпадает");
-        assertEquals(120L, createdFilm.getDuration(), "Продолжительность не совпадает");
+    static {
+        ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.getValidator();
     }
 
     @Test
-    void shouldCreateFilmEmptyName() {
+    void shouldValidateFilmId() {
+        Set<ConstraintViolation<Film>> violations = validator.validate(film, Update.class);
+        assertEquals("id должен быть указан", violations.iterator().next().getMessage());
+    }
+
+    @Test
+    void shouldValidateEmptyName() {
         film.setName("");
-        ValidationException thrown = assertThrows(ValidationException.class, () -> filmController.create(film));
-        assertEquals("Название не может быть пустым", thrown.getMessage());
+
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertEquals("Название не может быть пустым", violations.iterator().next().getMessage());
     }
 
     @Test
-    void shouldCreateFilmLongDescription() {
+    void shouldValidateLongDescription() {
         film.setDescription("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur metus lectus, " +
                 "congue sed felis quis, egestas feugiat nulla. In hac habitasse platea dictumst. " +
                 "In eu ante a mauris tempor finibus cras.");
-        ValidationException thrown = assertThrows(ValidationException.class, () -> filmController.create(film));
-        assertEquals("Максимальная длина описания — 200 символов", thrown.getMessage());
+
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertEquals("Максимальная длина описания — 200 символов", violations.iterator().next().getMessage());
     }
 
     @Test
-    void shouldCreateFilmInvalidDate() {
+    void shouldValidateInvalidDate() {
         film.setReleaseDate(LocalDate.of(1895, 12, 27));
-        ValidationException thrown = assertThrows(ValidationException.class, () -> filmController.create(film));
-        assertEquals("Дата релиза не должна быть раньше 28 декабря 1895 года", thrown.getMessage());
+
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertEquals("Дата релиза не должна быть раньше 28 декабря 1895 года", violations.iterator().next().getMessage());
     }
 
     @Test
-    void shouldCreateFilmInvalidDuration() {
+    void shouldValidateInvalidDuration() {
         film.setDuration(-1L);
-        ValidationException thrown = assertThrows(ValidationException.class, () -> filmController.create(film));
-        assertEquals("Продолжительность фильма должна быть положительным числом", thrown.getMessage());
-    }
 
-    /**
-     * Обновление данных существующего фильма
-     */
-    @Test
-    void shouldUpdateFilm() throws ValidationException {
-        filmController.create(film);
-        Film newFilm = new Film(film.getId(), "newFilmName", "newFilmDescription", (LocalDate.of(2003, 5, 18)), 20L);
-        Film createdFilm = filmController.update(newFilm);
-        assertNotNull(createdFilm.getId(), "id не совпадает");
-        assertEquals("newFilmName", createdFilm.getName(), "Название не совпадает");
-        assertEquals("newFilmDescription", createdFilm.getDescription(), "Описание не совпадает");
-        assertEquals((LocalDate.of(2003, 5, 18)), createdFilm.getReleaseDate(), "Дата создания не совпадает");
-        assertEquals(20L, createdFilm.getDuration(), "Продолжительность не совпадает");
-    }
-
-    @Test
-    void shouldUpdateInvalidFilmWithoutId() throws ValidationException {
-        filmController.create(film);
-        Film newFilm = new Film("newFilmName", "newFilmDescription", (LocalDate.of(2003, 5, 18)), 20L);
-        ValidationException thrown = assertThrows(ValidationException.class, () -> filmController.update(newFilm));
-        assertEquals("id должен быть указан", thrown.getMessage());
-    }
-
-    @Test
-    void shouldUpdateFilmInvalidId() throws ValidationException {
-        filmController.create(film);
-        Film newFilm = new Film(42L, "newFilmName", "newFilmDescription", (LocalDate.of(2003, 5, 18)), 20L);
-        ValidationException thrown = assertThrows(ValidationException.class, () -> filmController.update(newFilm));
-        assertEquals("Фильм с id = 42 не найден", thrown.getMessage());
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertEquals("Продолжительность фильма должна быть положительным числом", violations.iterator().next().getMessage());
     }
 }

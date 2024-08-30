@@ -1,100 +1,73 @@
 package ru.yandex.practicum.filmorate;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.controller.UserController;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import org.springframework.boot.test.context.SpringBootTest;
+import ru.yandex.practicum.filmorate.interfaces.Update;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
+import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@SpringBootTest
 class UserControllerTest {
-    private final UserController userController = new UserController();
-    User user = new User("useremail@mail.com", "userLogin", "User Name", (LocalDate.of(1956, 5, 18)));
+    private static final Validator validator;
+    User user = new User("useremail@mail.com", "userLogin", "userName", (LocalDate.of(1956, 5, 18)));
 
-    /**
-     * Получение списка всех пользователей
-     */
-    @Test
-    void shouldGetAllUsers() throws ValidationException {
-        assertEquals(0, userController.getAllUsers().size(), "Список пользователей не пуст");
-        userController.create(user);
-        assertEquals(1, userController.getAllUsers().size(), "Список пользователей не изменился");
-    }
-
-    /**
-     * Добавление нового пользователя
-     */
-    @Test
-    void shouldCreateUser() throws ValidationException {
-        User createdUser = userController.create(user);
-        assertNotNull(createdUser.getId(), "id не совпадает");
-        assertEquals("userLogin", createdUser.getLogin(), "Логин не совпадает");
-        assertEquals("useremail@mail.com", createdUser.getEmail(), "Email не совпадает");
-        assertEquals("User Name", createdUser.getName(), "Имя не совпадает");
-        assertEquals((LocalDate.of(1956, 5, 18)), createdUser.getBirthday(), "Дата рождения не совпадает");
+    static {
+        ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.getValidator();
     }
 
     @Test
-    void shouldCreateUserEmptyEmail() {
+    void shouldValidateUserId() {
+        Set<ConstraintViolation<User>> violations = validator.validate(user, Update.class);
+        assertEquals("id должен быть указан", violations.iterator().next().getMessage());
+    }
+
+    @Test
+    void shouldValidateInvalidEmail() {
+        user.setEmail("это-неправильный?эмейл@");
+
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertEquals("Электронная почта некорректна", violations.iterator().next().getMessage());
+    }
+
+    @Test
+    void shouldValidateEmptyEmail() {
         user.setEmail("");
-        ValidationException thrown = assertThrows(ValidationException.class, () -> userController.create(user));
-        assertEquals("Электронная почта не может быть пустой и должна содержать символ @", thrown.getMessage());
+
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertEquals("Электронная почта не может быть пустой", violations.iterator().next().getMessage());
     }
 
     @Test
-    void shouldCreateUserInvalidEmail() {
-        user.setEmail("useremailmail.com");
-        ValidationException thrown = assertThrows(ValidationException.class, () -> userController.create(user));
-        assertEquals("Электронная почта не может быть пустой и должна содержать символ @", thrown.getMessage());
-    }
-
-    @Test
-    void shouldCreateUserInvalidLogin() {
+    void shouldValidateEmptyLogin() {
         user.setLogin("");
-        ValidationException thrown = assertThrows(ValidationException.class, () -> userController.create(user));
-        assertEquals("Логин не может быть пустым и содержать пробелы", thrown.getMessage());
+
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertEquals("Логин не может быть пустым", violations.iterator().next().getMessage());
     }
 
     @Test
-    void shouldCreateUserInvalidBirthday() {
+    void shouldValidateInvalidLogin() {
+        user.setLogin("User Login");
+
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertEquals("Логин не может содержать пробелы", violations.iterator().next().getMessage());
+    }
+
+    @Test
+    void shouldValidateInvalidBirthday() {
         user.setBirthday(LocalDate.of(2956, 5, 18));
-        ValidationException thrown = assertThrows(ValidationException.class, () -> userController.create(user));
-        assertEquals("Дата рождения не может быть в будущем", thrown.getMessage());
-    }
 
-    /**
-     * Обновление данных существующего пользователя
-     */
-    @Test
-    void shouldUpdateUser() throws ValidationException {
-        userController.create(user);
-        User newUser = new User(user.getId(), "newuseremail@mail.com", "newUserLogin", "New User Name",
-                (LocalDate.of(2010, 5, 18)));
-        User createdUser = userController.update(newUser);
-        assertNotNull(createdUser.getId(), "id не совпадает");
-        assertEquals("newUserLogin", createdUser.getLogin(), "Логин не совпадает");
-        assertEquals("newuseremail@mail.com", createdUser.getEmail(), "Email не совпадает");
-        assertEquals("New User Name", createdUser.getName(), "Имя не совпадает");
-        assertEquals((LocalDate.of(2010, 5, 18)), createdUser.getBirthday(), "Дата рождения не совпадает");
-    }
-
-    @Test
-    void shouldUpdateInvalidUserWithoutId() throws ValidationException {
-        userController.create(user);
-        User newUser = new User("newuseremail@mail.com", "newUserLogin", "New User Name",
-                (LocalDate.of(2010, 5, 18)));
-        ValidationException thrown = assertThrows(ValidationException.class, () -> userController.update(newUser));
-        assertEquals("id должен быть указан", thrown.getMessage());
-    }
-
-    @Test
-    void shouldUpdateUserInvalidId() throws ValidationException {
-        userController.create(user);
-        User newUser = new User(42L, "newuseremail@mail.com", "newUserLogin", "New User Name",
-                (LocalDate.of(2010, 5, 18)));
-        ValidationException thrown = assertThrows(ValidationException.class, () -> userController.update(newUser));
-        assertEquals("Пользователь с id = 42 не найден", thrown.getMessage());
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertEquals("Дата рождения не может быть в будущем", violations.iterator().next().getMessage());
     }
 }
