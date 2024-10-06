@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 class FilmControllerTest {
     private static final Validator validator;
-    Film film = new Film("filmName", "filmDescription", (LocalDate.of(1956, 5, 18)), 120L);
+    Film film = new Film(null,"filmName", "filmDescription", 120L, (LocalDate.of(1956, 5, 18)));
 
     static {
         ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();

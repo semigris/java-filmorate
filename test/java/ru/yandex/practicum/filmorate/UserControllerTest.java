@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 class UserControllerTest {
     private static final Validator validator;
-    User user = new User("useremail@mail.com", "userLogin", "userName", (LocalDate.of(1956, 5, 18)));
+    User user = new User(null, "useremail@mail.com", "userLogin", "userName", (LocalDate.of(1956, 5, 18)));
 
     static {
         ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
