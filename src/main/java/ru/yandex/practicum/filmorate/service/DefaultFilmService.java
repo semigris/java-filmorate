@@ -13,8 +13,8 @@ import java.util.Collection;
 @Service
 @RequiredArgsConstructor
 public class DefaultFilmService implements FilmService {
-    final UserRepository userRepository;
-    final FilmRepository filmRepository;
+    private final UserRepository userRepository;
+    private final FilmRepository filmRepository;
 
     @Override
     public Film get(Long filmId) {
