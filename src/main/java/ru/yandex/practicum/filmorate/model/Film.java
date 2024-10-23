@@ -1,14 +1,20 @@
 package ru.yandex.practicum.filmorate.model;
 
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import ru.yandex.practicum.filmorate.interfaces.Update;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
+@Getter
 @EqualsAndHashCode(of = "name")
+@AllArgsConstructor
 public class Film {
     @NotNull(groups = {Update.class}, message = "id должен быть указан")
     private Long id;
@@ -26,22 +32,5 @@ public class Film {
     }
 
     private LocalDate releaseDate;
-
-    public Film() {
-    }
-
-    public Film(Long id, String name, String description, LocalDate releaseDate, Long duration) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
-    }
-
-    public Film(String name, String description, LocalDate releaseDate, Long duration) {
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
-    }
+    private final Set<Long> likes = new HashSet<>();
 }
