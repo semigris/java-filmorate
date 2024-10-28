@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS films (
     description varchar(100),
     duration integer NOT NULL,
     releaseDate date NOT NULL,
-    mpa integer NOT NULL,
+    mpa integer,
     FOREIGN KEY (mpa) REFERENCES mpa(id)
 );
 
@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS genres (
     name varchar(100) NOT NULL UNIQUE
 );
 
-CREATE TABLE IF NOT EXISTS film_genre (
+CREATE TABLE IF NOT EXISTS film_genres (
     film_id integer,
     genre_id integer,
     PRIMARY KEY (film_id, genre_id),

@@ -22,7 +22,6 @@ public class FilmMapper {
                 .releaseDate(film.getReleaseDate())
                 .mpa(film.getMpa())
                 .genres(film.getGenres())
-                .likes(film.getLikes())
                 .build();
     }
 
@@ -34,7 +33,6 @@ public class FilmMapper {
                 .duration(request.getDuration())
                 .releaseDate(request.getReleaseDate())
                 .genres(request.getGenres())
-                .likes(request.getLikes())
                 .build();
 
         if (request.getMpa() != null) {
@@ -68,10 +66,6 @@ public class FilmMapper {
 
         if (request.hasGenres()) {
             film.setGenres(request.getGenres());
-        }
-
-        if (request.hasLikes()) {
-            film.setLikes(request.getLikes());
         }
 
         return film;

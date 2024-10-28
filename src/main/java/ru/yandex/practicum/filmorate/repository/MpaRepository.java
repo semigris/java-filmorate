@@ -20,6 +20,6 @@ public class MpaRepository extends BaseRepository<Mpa> {
     }
 
     public Collection<Mpa> getAllMpas() {
-        return findMany("SELECT * FROM mpa");
+        return findMany("SELECT * FROM mpa ORDER BY id");
     }
 }

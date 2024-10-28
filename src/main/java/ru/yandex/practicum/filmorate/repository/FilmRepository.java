@@ -10,19 +10,32 @@ import java.util.Optional;
 
 @Repository
 public class FilmRepository extends BaseRepository<Film> {
+//    private static final String GET_QUERY = """
+//            SELECT f.*,
+//                   m.name AS mpa_name,
+//            FROM films AS f
+//            LEFT JOIN mpa AS m ON f.mpa = m.id
+//            WHERE f.id = ?
+//            GROUP BY f.id;
+//            """;
+
     private static final String GET_QUERY = """
             SELECT f.*,
-                   m.name
+                   m.name AS mpa_name,
+                   g.id AS genre_id,
+                   g.name AS genre_name
             FROM films AS f
-            LEFT JOIN mpa AS m ON f.id = m.id
+            LEFT JOIN mpa AS m ON m.id = f.mpa
+            LEFT JOIN film_genres AS fg ON fg.film_id = f.id
+            LEFT JOIN genres AS g ON g.id = fg.genre_id
             WHERE f.id = ?
-             """;
+            """;
+
 
     private static final String CREATE_QUERY = """
             INSERT INTO films(name, description, duration, releaseDate, mpa)
             VALUES (?, ?, ?, ?, ?)
             """;
-
     private static final String UPDATE_QUERY = """
             UPDATE films
             SET name = ?, description = ?, duration = ?, releaseDate = ?, mpa = ? WHERE id = ?
@@ -33,16 +46,16 @@ public class FilmRepository extends BaseRepository<Film> {
             """;
     private static final String GET_ALL_QUERY = """
             SELECT f.*,
-                   m.id,
-                   m.name
+                   m.name AS mpa_name,
             FROM films AS f
-            LEFT JOIN mpa AS m ON f.id = m.id
+            LEFT JOIN mpa AS m ON f.mpa = m.id
             """;
-
     private static final String GET_POPULAR_FILMS_QUERY = """
             SELECT f.*,
-            COUNT(fl.user_id) AS likes_count
+                   m.name AS mpa_name,
+                   COUNT(fl.user_id) AS likes_count
             FROM films AS f
+            LEFT JOIN mpa AS m ON f.mpa = m.id
             LEFT JOIN film_likes AS fl ON f.id = fl.film_id
             GROUP BY f.id
             ORDER BY likes_count DESC
@@ -52,11 +65,14 @@ public class FilmRepository extends BaseRepository<Film> {
             INSERT INTO film_likes(film_id, user_id)
             VALUES (?, ?)
             """;
-
     private static final String DELETE_LIKE_QUERY = """
             DELETE FROM film_likes
             WHERE film_id = ?
             AND user_id = ?
+            """;
+    private static final String ADD_GENRE_QUERY = """
+            INSERT INTO film_genres(film_id, genre_id)
+            VALUES (?, ?)
             """;
 
     public FilmRepository(JdbcTemplate jdbc, FilmRowMapper filmRowMapper) {
@@ -76,8 +92,7 @@ public class FilmRepository extends BaseRepository<Film> {
                 newFilm.getDescription(),
                 newFilm.getDuration(),
                 newFilm.getReleaseDate(),
-                newFilm.getMpa().getId()
-        );
+                newFilm.getMpa() != null ? newFilm.getMpa().getId() : null);
         newFilm.setId(id);
         return newFilm;
     }
@@ -127,5 +142,12 @@ public class FilmRepository extends BaseRepository<Film> {
                 DELETE_LIKE_QUERY,
                 filmId,
                 userId);
+    }
+
+    public void addGenre(Long filmId, Long genreId) {
+        update(
+                ADD_GENRE_QUERY,
+                filmId,
+                genreId);
     }
 }

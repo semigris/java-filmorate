@@ -18,5 +18,4 @@ public class FilmDto {
     private LocalDate releaseDate;
     private Mpa mpa;
     private LinkedHashSet<Genre> genres;
-    private LinkedHashSet<Long> likes;
 }

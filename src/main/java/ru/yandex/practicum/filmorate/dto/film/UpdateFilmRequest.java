@@ -31,7 +31,6 @@ public class UpdateFilmRequest {
     private LocalDate releaseDate;
     private Mpa mpa;
     LinkedHashSet<Genre> genres;
-    LinkedHashSet<Long> likes;
 
 
     public boolean hasName() {
@@ -56,9 +55,5 @@ public class UpdateFilmRequest {
 
     public boolean hasGenres() {
         return genres != null;
-    }
-
-    public boolean hasLikes() {
-        return likes != null;
     }
 }

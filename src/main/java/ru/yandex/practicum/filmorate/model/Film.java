@@ -31,5 +31,4 @@ public class Film {
     private LocalDate releaseDate;
     private Mpa mpa;
     LinkedHashSet<Genre> genres;
-    LinkedHashSet<Long> likes;
 }

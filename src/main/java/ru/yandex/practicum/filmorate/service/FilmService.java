@@ -13,6 +13,7 @@ import ru.yandex.practicum.filmorate.repository.UserRepository;
 import ru.yandex.practicum.filmorate.service.mapper.FilmMapper;
 
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Optional;
 
 @Service
@@ -50,6 +51,14 @@ public class FilmService {
         }
         Film film = FilmMapper.mapToFilm(newFilm);
         filmRepository.create(film);
+        if (newFilm.getGenres() != null) {
+            for (var genre : newFilm.getGenres()) {
+                filmRepository.addGenre(film.getId(), genre.getId());
+            }
+        } else {
+            film.setGenres(new LinkedHashSet<>());
+        }
+
         return FilmMapper.mapToFilmDto(film);
     }
 

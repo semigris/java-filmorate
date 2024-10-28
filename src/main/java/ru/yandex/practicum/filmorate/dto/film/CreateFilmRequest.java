@@ -28,5 +28,4 @@ public class CreateFilmRequest {
     private LocalDate releaseDate;
     private Mpa mpa;
     LinkedHashSet<Genre> genres;
-    LinkedHashSet<Long> likes;
 }

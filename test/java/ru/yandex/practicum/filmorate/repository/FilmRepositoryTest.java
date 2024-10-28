@@ -98,32 +98,11 @@ class FilmRepositoryTest {
     }
 
     @Test
-    void shouldAddLike() {
-        Film createdFilm = filmRepository.create(film);
-        filmRepository.addLike(createdFilm.getId(), user.getId());
-
-        Collection<Film> popularFilms = filmRepository.getPopularFilms(1);
-        assertThat(popularFilms).isNotEmpty();
-        assertThat(popularFilms.iterator().next().getId()).isEqualTo(createdFilm.getId());
-    }
-
-    @Test
-    void shouldDeleteLike() {
-        Film createdFilm = filmRepository.create(film);
-        filmRepository.addLike(createdFilm.getId(), user.getId());
-        filmRepository.deleteLike(createdFilm.getId(), user.getId());
-
-        Optional<Film> foundFilm = filmRepository.get(createdFilm.getId());
-        assertThat(foundFilm).hasValueSatisfying(film ->
-                assertThat(film).hasFieldOrPropertyWithValue("likes", null));
-    }
-
-    @Test
     void shouldGetPopularFilms() {
         Film createdFilm = filmRepository.create(film);
         filmRepository.addLike(createdFilm.getId(), user.getId());
 
-        Collection<Film> popularFilms = filmRepository.getPopularFilms(1);
+        Collection<Film> popularFilms = filmRepository.getPopularFilms(10);
         assertThat(popularFilms)
                 .isNotEmpty()
                 .hasSize(1);
