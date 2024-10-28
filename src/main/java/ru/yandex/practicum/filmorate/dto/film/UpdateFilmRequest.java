@@ -1,18 +1,18 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.dto.film;
 
 import jakarta.validation.constraints.*;
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
 import ru.yandex.practicum.filmorate.interfaces.Update;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
 
 @Data
 @Builder
-@Getter
-@EqualsAndHashCode(of = "name")
-@AllArgsConstructor
-public class Film {
+public class UpdateFilmRequest {
     @NotNull(groups = {Update.class}, message = "id должен быть указан")
     private Long id;
     @NotBlank(message = "Название не может быть пустым")
@@ -32,4 +32,33 @@ public class Film {
     private Mpa mpa;
     LinkedHashSet<Genre> genres;
     LinkedHashSet<Long> likes;
+
+
+    public boolean hasName() {
+        return !(name == null || name.isBlank());
+    }
+
+    public boolean hasDescription() {
+        return !(description == null || description.isBlank());
+    }
+
+    public boolean hasDuration() {
+        return duration != null;
+    }
+
+    public boolean hasReleaseDate() {
+        return releaseDate != null;
+    }
+
+    public boolean hasMpa() {
+        return mpa != null;
+    }
+
+    public boolean hasGenres() {
+        return genres != null;
+    }
+
+    public boolean hasLikes() {
+        return likes != null;
+    }
 }

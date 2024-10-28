@@ -1,21 +1,15 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.dto.user;
 
 import jakarta.validation.constraints.*;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import ru.yandex.practicum.filmorate.interfaces.Update;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
 @Data
 @Builder
-@Getter
-@EqualsAndHashCode(of = "email")
-public class User {
+public class UpdateUserRequest {
     @NotNull(groups = {Update.class}, message = "id должен быть указан")
     private Long id;
     @Email(message = "Электронная почта некорректна")
@@ -28,5 +22,21 @@ public class User {
     @NotNull(message = "Дата рождения долджна быть указана")
     @PastOrPresent(message = "Дата рождения не может быть в будущем")
     private LocalDate birthday;
-    private final Set<Long> friends = new HashSet<>();
+
+
+    public boolean hasEmail() {
+        return !(email == null || email.isBlank());
+    }
+
+    public boolean hasLogin() {
+        return !(login == null || login.isBlank());
+    }
+
+    public boolean hasName() {
+        return !(name == null || name.isBlank());
+    }
+
+    public boolean hasBirthday() {
+        return birthday != null;
+    }
 }

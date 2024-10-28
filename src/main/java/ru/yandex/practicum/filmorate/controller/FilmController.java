@@ -5,9 +5,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.interfaces.FilmService;
+import ru.yandex.practicum.filmorate.dto.film.CreateFilmRequest;
+import ru.yandex.practicum.filmorate.dto.film.FilmDto;
+import ru.yandex.practicum.filmorate.dto.film.UpdateFilmRequest;
 import ru.yandex.practicum.filmorate.interfaces.Update;
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.Collection;
 
@@ -23,8 +25,8 @@ public class FilmController {
      * Получение фильма по их уникальному идентификатору
      */
     @GetMapping("/{filmId}")
-    public Film getFilm(@PathVariable Long filmId) {
-        log.info("Получение фильма: " + filmId);
+    public FilmDto getFilm(@PathVariable Long filmId) {
+        log.info("Получение фильма " + filmId);
         return filmService.get(filmId);
     }
 
@@ -32,8 +34,8 @@ public class FilmController {
      * Добавление нового фильма
      */
     @PostMapping
-    public Film createFilm(@Valid @RequestBody Film newFilm) {
-        log.info("Добавление информации о фильме: " + newFilm);
+    public FilmDto createFilm(@Valid @RequestBody CreateFilmRequest newFilm) {
+        log.info("Добавление информации о фильме " + newFilm);
         return filmService.create(newFilm);
     }
 
@@ -42,16 +44,25 @@ public class FilmController {
      */
     @PutMapping
     @Validated({Update.class})
-    public Film updateFilm(@Valid @RequestBody Film newFilm) {
-        log.info("Обновление информации о фильме: " + newFilm.getId());
+    public FilmDto updateFilm(@Valid @RequestBody UpdateFilmRequest newFilm) {
+        log.info("Обновление информации о фильме " + newFilm.getId());
         return filmService.update(newFilm);
+    }
+
+    /**
+     * Удаление фильма
+     */
+    @DeleteMapping("/{filmId}")
+    public void deleteFilm(@PathVariable Long filmId) {
+        log.info("Удаление фильма " + filmId);
+        filmService.delete(filmId);
     }
 
     /**
      * Получение списка фильмов
      */
     @GetMapping
-    public Collection<Film> getAllFilms() {
+    public Collection<FilmDto> getAllFilms() {
         log.info("Получение информации о фильмах");
         return filmService.getAllFilms();
     }
@@ -61,7 +72,7 @@ public class FilmController {
      * Если значение параметра count не задано, вернет первые 10.
      */
     @GetMapping("/popular")
-    public Collection<Film> getPopularFilms(@RequestParam int count) {
+    public Collection<FilmDto> getPopularFilms(@RequestParam int count) {
         if (count == 0) {
             count = 10;
         }
