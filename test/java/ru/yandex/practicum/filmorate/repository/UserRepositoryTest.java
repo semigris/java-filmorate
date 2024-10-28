@@ -1,12 +1,12 @@
 package ru.yandex.practicum.filmorate.repository;
 
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
-import lombok.RequiredArgsConstructor;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.repository.mapper.UserRowMapper;
 
@@ -23,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class UserRepositoryTest {
     private final UserRepository userRepository;
     private User user;
+
     @BeforeEach
     public void init() {
         user = User.builder()
@@ -34,7 +35,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    void shouldCreateUser () {
+    void shouldCreateUser() {
         User createdUser = userRepository.create(user);
 
         assertThat(createdUser.getEmail()).isEqualTo(user.getEmail());
@@ -45,7 +46,7 @@ class UserRepositoryTest {
     @Test
     void shouldGetUserById() {
         User createdUser = userRepository.create(user);
-        Optional<User> foundUser  = userRepository.get(createdUser.getId());
+        Optional<User> foundUser = userRepository.get(createdUser.getId());
 
         assertThat(foundUser)
                 .isPresent()
@@ -55,7 +56,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    void shouldUpdateUser () {
+    void shouldUpdateUser() {
         User createdUser = userRepository.create(user);
         createdUser.setName("New name");
         User updatedUser = userRepository.update(createdUser);
@@ -64,7 +65,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    void shouldDeleteUser () {
+    void shouldDeleteUser() {
         User createdUser = userRepository.create(user);
         userRepository.delete(createdUser.getId());
 
