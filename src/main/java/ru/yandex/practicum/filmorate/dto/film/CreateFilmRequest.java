@@ -18,14 +18,13 @@ public class CreateFilmRequest {
     private String description;
     @Positive(message = "Продолжительность фильма должна быть положительным числом")
     private Long duration;
-
     @NotNull(message = "Дата релиза долджна быть указана")
+    private LocalDate releaseDate;
+    private Mpa mpa;
+    private LinkedHashSet<Genre> genres;
+
     @AssertTrue(message = "Дата релиза не должна быть раньше 28 декабря 1895 года")
     public boolean isValidReleaseDate() {
         return releaseDate.isAfter(LocalDate.of(1895, 12, 28));
     }
-
-    private LocalDate releaseDate;
-    private Mpa mpa;
-    LinkedHashSet<Genre> genres;
 }

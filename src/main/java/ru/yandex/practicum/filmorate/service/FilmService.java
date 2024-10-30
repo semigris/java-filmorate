@@ -33,6 +33,7 @@ public class FilmService {
     public FilmDto create(CreateFilmRequest newFilm) {
         Optional.ofNullable(newFilm)
                 .orElseThrow(() -> new NotFoundException("Информация о фильме не может быть NULL"));
+
         if (newFilm.getMpa() != null) {
             try {
                 mpaService.get(newFilm.getMpa().getId());
@@ -49,6 +50,7 @@ public class FilmService {
                 }
             }
         }
+
         Film film = FilmMapper.mapToFilm(newFilm);
         filmRepository.create(film);
         if (newFilm.getGenres() != null) {
@@ -65,8 +67,34 @@ public class FilmService {
     public FilmDto update(UpdateFilmRequest newFilm) {
         Film filmForUpdate = filmRepository.get(newFilm.getId())
                 .orElseThrow(() -> new NotFoundException("Фильм с id " + newFilm.getId() + " не найден"));
+
+        if (newFilm.getMpa() != null) {
+            try {
+                mpaService.get(newFilm.getMpa().getId());
+            } catch (Exception e) {
+                throw new NotValidException("Рейтинг с id " + newFilm.getMpa().getId() + " не найден");
+            }
+        }
+        if (newFilm.getGenres() != null) {
+            for (var genre : newFilm.getGenres()) {
+                try {
+                    genreService.get(genre.getId());
+                } catch (Exception e) {
+                    throw new NotValidException("Жанр с id " + genre.getId() + " не найден");
+                }
+            }
+        }
+
         Film film = FilmMapper.updateFilmFields(filmForUpdate, newFilm);
         filmRepository.update(film);
+        if (newFilm.getGenres() != null) {
+            for (var genre : newFilm.getGenres()) {
+                filmRepository.addGenre(film.getId(), genre.getId());
+            }
+        } else {
+            film.setGenres(new LinkedHashSet<>());
+        }
+
         return FilmMapper.mapToFilmDto(film);
     }
 

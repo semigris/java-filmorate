@@ -9,10 +9,10 @@ import java.util.Set;
 @Data
 @Builder
 public class UserDto {
-    Long id;
-    String email;
-    String login;
-    String name;
-    LocalDate birthday;
-    Set<Long> friends;
+    private Long id;
+    private String email;
+    private String login;
+    private String name;
+    private LocalDate birthday;
+    private Set<Long> friends;
 }

@@ -10,28 +10,15 @@ import java.util.Optional;
 
 @Repository
 public class FilmRepository extends BaseRepository<Film> {
-//    private static final String GET_QUERY = """
-//            SELECT f.*,
-//                   m.name AS mpa_name,
-//            FROM films AS f
-//            LEFT JOIN mpa AS m ON f.mpa = m.id
-//            WHERE f.id = ?
-//            GROUP BY f.id;
-//            """;
 
+    private final GenreRepository genreRepository;
     private static final String GET_QUERY = """
             SELECT f.*,
-                   m.name AS mpa_name,
-                   g.id AS genre_id,
-                   g.name AS genre_name
+                   m.name AS mpa_name
             FROM films AS f
             LEFT JOIN mpa AS m ON m.id = f.mpa
-            LEFT JOIN film_genres AS fg ON fg.film_id = f.id
-            LEFT JOIN genres AS g ON g.id = fg.genre_id
             WHERE f.id = ?
             """;
-
-
     private static final String CREATE_QUERY = """
             INSERT INTO films(name, description, duration, releaseDate, mpa)
             VALUES (?, ?, ?, ?, ?)
@@ -46,7 +33,7 @@ public class FilmRepository extends BaseRepository<Film> {
             """;
     private static final String GET_ALL_QUERY = """
             SELECT f.*,
-                   m.name AS mpa_name,
+                   m.name AS mpa_name
             FROM films AS f
             LEFT JOIN mpa AS m ON f.mpa = m.id
             """;
@@ -75,14 +62,18 @@ public class FilmRepository extends BaseRepository<Film> {
             VALUES (?, ?)
             """;
 
-    public FilmRepository(JdbcTemplate jdbc, FilmRowMapper filmRowMapper) {
+    public FilmRepository(JdbcTemplate jdbc, FilmRowMapper filmRowMapper, GenreRepository genreRepository) {
         super(jdbc, filmRowMapper);
+        this.genreRepository = genreRepository;
     }
 
     public Optional<Film> get(Long filmId) {
-        return findOne(
-                GET_QUERY,
-                filmId);
+        Optional<Film> optionalFilm = findOne(GET_QUERY, filmId);
+        if (optionalFilm.isPresent()) {
+            Film film = optionalFilm.get();
+            film.setGenres(genreRepository.putGenresToFilm(film.getId()));
+        }
+        return optionalFilm;
     }
 
     public Film create(Film newFilm) {
@@ -118,14 +109,20 @@ public class FilmRepository extends BaseRepository<Film> {
     }
 
     public Collection<Film> getAllFilms() {
-        return findMany(GET_ALL_QUERY);
+        Collection<Film> films = findMany(GET_ALL_QUERY);
+        for (Film film : films) {
+            film.setGenres(genreRepository.putGenresToFilm(film.getId()));
+        }
+        return films;
     }
 
 
     public Collection<Film> getPopularFilms(int count) {
-        return findMany(
-                GET_POPULAR_FILMS_QUERY,
-                count);
+        Collection<Film> films = findMany(GET_POPULAR_FILMS_QUERY, count);
+        for (Film film : films) {
+            film.setGenres(genreRepository.putGenresToFilm(film.getId()));
+        }
+        return films;
     }
 
 
