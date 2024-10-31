@@ -5,10 +5,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.dto.user.CreateUserRequest;
+import ru.yandex.practicum.filmorate.dto.user.UpdateUserRequest;
+import ru.yandex.practicum.filmorate.dto.user.UserDto;
 import ru.yandex.practicum.filmorate.interfaces.Update;
-import ru.yandex.practicum.filmorate.interfaces.UserService;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.Collection;
 
@@ -23,9 +24,9 @@ public class UserController {
     /**
      * Получение данных о пользователях по их уникальному идентификатору
      */
-    @GetMapping("/{UserId}")
-    public User getUser(@PathVariable Long userId) {
-        log.info("Получение данных о пользователе: " + userId);
+    @GetMapping("/{userId}")
+    public UserDto getUser(@PathVariable Long userId) {
+        log.info("Получение данных о пользователе " + userId);
         return userService.get(userId);
     }
 
@@ -33,8 +34,8 @@ public class UserController {
      * Добавление нового пользователя
      */
     @PostMapping
-    public User createUser(@Valid @RequestBody User newUser) {
-        log.info("Добавление информации о пользователе: " + newUser);
+    public UserDto createUser(@Valid @RequestBody CreateUserRequest newUser) {
+        log.info("Добавление информации о пользователе " + newUser);
         return userService.create(newUser);
     }
 
@@ -43,16 +44,25 @@ public class UserController {
      */
     @PutMapping
     @Validated({Update.class})
-    public User updateUser(@RequestBody User newUser) throws NotFoundException {
-        log.info("Обновление информации о пользователе: " + newUser.getId());
+    public UserDto updateUser(@RequestBody UpdateUserRequest newUser) {
+        log.info("Обновление информации о пользователе " + newUser.getId());
         return userService.update(newUser);
+    }
+
+    /**
+     * Удаление пользователя
+     */
+    @DeleteMapping("/{userId}")
+    public void deleteUser(@PathVariable Long userId) {
+        log.info("Удаление пользователя " + userId);
+        userService.delete(userId);
     }
 
     /**
      * Получение списка всех пользователей
      */
     @GetMapping
-    public Collection<User> getAllUsers() {
+    public Collection<UserDto> getAllUsers() {
         log.info("Получение информации о пользователях");
         return userService.getAllUsers();
     }
@@ -79,7 +89,7 @@ public class UserController {
      * Возвращаем список друзей пользователя
      */
     @GetMapping("/{userId}/friends")
-    public Collection<User> getUserFriends(@PathVariable Long userId) {
+    public Collection<UserDto> getUserFriends(@PathVariable Long userId) {
         log.info("Получение списка друзей пользователя " + userId);
         return userService.getUserFriends(userId);
     }
@@ -88,7 +98,7 @@ public class UserController {
      * Список друзей, общих с другим пользователем
      */
     @GetMapping("/{userId}/friends/common/{otherId}")
-    public Collection<User> getCommonFriends(@PathVariable Long userId, @PathVariable Long otherId) {
+    public Collection<UserDto> getCommonFriends(@PathVariable Long userId, @PathVariable Long otherId) {
         log.info("Получение списка общих друзей пользователей " + userId + " и " + otherId);
         return userService.getCommonFriends(userId, otherId);
     }
