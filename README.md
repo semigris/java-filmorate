@@ -1,7 +1,7 @@
 # java-filmorate
 
 ### Entity Relationship Diagrams (ERD)
-![Mind Map.jpg](..%2F..%2FDesktop%2FMind%20Map.jpg)
+![ERD.jpg](src%2Fmain%2Fresources%2FERD.jpg)
 
 ### Пояснение к схеме:
 #### Таблица `mpa`:
